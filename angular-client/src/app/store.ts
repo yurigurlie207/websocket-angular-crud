@@ -36,6 +36,14 @@ export class TodoStore {
         }
         this.todos = res.data.map(mapTodo);
         this.todos.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' }));
+
+        const priorityOrder: { [key: string]: number } = {
+          'Hi-Pri': 1,
+          'Medium': 2,
+          'Low': 3
+        };
+        this.todos.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+
         console.log(this.todos)
         
       });

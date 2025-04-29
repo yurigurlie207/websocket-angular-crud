@@ -4,7 +4,7 @@
   }
 
 .highlightRed {
-  background-color: red; /* ✅ works in most browsers */
+  background-color: red; 
   font-weight: bold;
   }
   
