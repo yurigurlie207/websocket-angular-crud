@@ -1,0 +1,10 @@
+.todo-list li label {
+    display: inline-block;
+    margin-right: 20px;
+  }
+
+.highlightGreen {
+    color: green;
+    font-weight: bold;
+  }
+  

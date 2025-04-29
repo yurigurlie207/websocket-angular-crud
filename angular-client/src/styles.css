@@ -223,16 +223,6 @@ body {
   text-decoration: line-through;
 }
 
-.todo-list li label {
-  display: inline-block;
-  margin-right: 20px;
-}
-
-#highlightGreen {
-  background-color: green;
-}
-
-
 
 .todo-list li .destroy {
   display: none;

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import {type Todo, TodoStore} from "./store";
@@ -12,7 +12,9 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
   styleUrl: './app.component.css',
   providers: [TodoStore]
 })
+
 export class AppComponent {
+  @ViewChild('priorityLabel') labelRef!: ElementRef;
   newTodoText = new FormControl('');
 
   constructor(readonly todoStore: TodoStore) {
@@ -61,6 +63,24 @@ export class AppComponent {
     }
   }
 
+  ngAfterViewInit() {
+    console.log("HM")
+    const labelEl = this.labelRef.nativeElement as HTMLElement;
+
+    if (labelEl.textContent?.trim() === 'Hi-Pri') {
+      labelEl.classList.add('highlightGreen');
+    }
+  }
   
 }
 
+
+// window.addEventListener("DOMContentLoaded", () => {
+//   const label = document.getElementById("priority") as HTMLElement | null;
+
+//   console.log(label);
+
+//   if (label && label.textContent?.trim() === "Hi-Pri") {
+//     label.classList.add("highlightGreen");
+//   }
+// });
