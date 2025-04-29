@@ -2,12 +2,12 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import {type Todo, TodoStore} from "./store";
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, ReactiveFormsModule],
+  imports: [CommonModule, RouterOutlet, ReactiveFormsModule, FormsModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
   providers: [TodoStore]
