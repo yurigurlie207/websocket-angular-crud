@@ -35,16 +35,18 @@ export class TodoStore {
           return;
         }
         this.todos = res.data.map(mapTodo);
-        this.todos.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' }));
 
-        const priorityOrder: { [key: string]: number } = {
-          'Hi-Pri': 1,
-          'Medium': 2,
-          'Low': 3
-        };
-        this.todos.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+        //not sure if this is where I should be sorting - i think this needs to happen else where
+        // this.todos.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' }));
 
-        console.log(this.todos)
+        // const priorityOrder: { [key: string]: number } = {
+        //   'Hi-Pri': 1,
+        //   'Medium': 2,
+        //   'Low': 3
+        // };
+        // this.todos.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+
+        // console.log(this.todos)
         
       });
     });
@@ -150,7 +152,17 @@ export class TodoStore {
         editing: false,
         synced: true
       });
+
+      //This will make sure the sort happens when anything new is added will be sorted
+      //however this needs to also be fed back to the server somewhere, and i did not take care of that yet
       this.todos.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' }));
+      const priorityOrder: { [key: string]: number } = {
+        'Hi-Pri': 1,
+        'Medium': 2,
+        'Low': 3
+      };
+      this.todos.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+
     });
   }
 }
