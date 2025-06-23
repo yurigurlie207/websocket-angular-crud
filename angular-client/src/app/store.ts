@@ -165,5 +165,15 @@ export class TodoStore {
 
     });
   }
+
+  update(todo: Todo) {
+    this.socket.emit("todo:update", todo, (res) => {
+      if (res && "error" in res) {
+        // handle the error
+        return;
+      }
+      todo.synced = true;
+    });
+  }
 }
 

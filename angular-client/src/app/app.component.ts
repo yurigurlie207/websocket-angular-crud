@@ -24,6 +24,7 @@ export class AppComponent {
   stopEditing(todo: Todo, editedTitle: string) {
     todo.title = editedTitle;
     todo.editing = false;
+    this.todoStore.update(todo);
   }
 
   cancelEditingTodo(todo: Todo) {
@@ -39,6 +40,10 @@ export class AppComponent {
     }
 
     todo.title = editedTitle;
+    this.todoStore.update(todo);
+  }
+  updatePriority(todo: Todo) {
+    this.todoStore.update(todo); // This should emit the update to the server
   }
 
   editTodo(todo: Todo) {
