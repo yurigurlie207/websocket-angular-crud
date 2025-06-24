@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import {type Todo, TodoStore} from "./store";
 import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { LoginComponent } from './login.component'; 
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, RouterOutlet, ReactiveFormsModule, FormsModule, LoginComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
   providers: [TodoStore]
@@ -67,6 +68,15 @@ export class AppComponent {
       this.todoStore.add(this.newTodoText.value!);
       this.newTodoText.setValue('');
     }
+  }
+
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
+  logout() {
+    localStorage.removeItem('token');
+    // Optionally redirect to login
   }
 
   // ngAfterViewInit() {
