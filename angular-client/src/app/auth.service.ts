@@ -7,6 +7,10 @@ export class AuthService {
   private readonly TOKEN_KEY = 'token';
 
   constructor(private http: HttpClient) {}
+  
+  register(userData: { username: string; email?: string; password: string }) {
+    return this.http.post('/register', userData);
+  }
 
   /**
    * Sends login request to backend and expects a JWT token in response.
