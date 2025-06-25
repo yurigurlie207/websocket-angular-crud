@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common'; 
-import { HttpClientModule } from '@angular/common/http';
+import { AuthService } from './auth.service';
+
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, CommonModule, HttpClientModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './login.component.html',
   styleUrls: ['./app.component.css']
 })
@@ -19,15 +19,12 @@ export class LoginComponent {
   password = '';
   error = '';
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private auth: AuthService, private router: Router) {}
 
   login() {
-    this.http.post<{ token: string }>('/login', {
-      username: this.username,
-      password: this.password
-    }).subscribe({
+    this.auth.login(this.username, this.password).subscribe({
       next: (response) => {
-        localStorage.setItem('token', response.token);
+        this.auth.setToken(response.token);
         this.router.navigate(['/']); // Redirect to main page or todos
       },
       error: (err) => {
