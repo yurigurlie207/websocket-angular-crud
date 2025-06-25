@@ -33,7 +33,8 @@ export default function ({ todoRepository }: Components) {
     ) {
       // @ts-ignore
       const socket: Socket<ClientEvents, ServerEvents> = this;
-
+      //user info from JWT
+      const user = socket.data.user;
       // validate the payload
       const { error, value } = todoSchema.tailor("create").validate(payload, {
         abortEarly: false,
@@ -65,6 +66,7 @@ export default function ({ todoRepository }: Components) {
 
       // notify the other users
       socket.broadcast.emit("todo:created", value);
+      console.log(user)
     },
 
     readTodo: async function (
