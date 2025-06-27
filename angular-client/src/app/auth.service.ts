@@ -9,14 +9,14 @@ export class AuthService {
   constructor(private http: HttpClient) {}
   
   register(userData: { username: string; email?: string; password: string }) {
-    return this.http.post('/register', userData);
+    return this.http.post('http://localhost:3000/register', userData);
   }
 
   /**
    * Sends login request to backend and expects a JWT token in response.
    */
   login(username: string, password: string): Observable<{ token: string }> {
-    return this.http.post<{ token: string }>('/login', { username, password });
+    return this.http.post<{ token: string }>('http://localhost:3000/login', { username, password });
   }
 
   /**
