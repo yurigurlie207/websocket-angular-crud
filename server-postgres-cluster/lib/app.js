@@ -1,10 +1,13 @@
 import { Server } from "socket.io";
 import createTodoHandlers from "./todo-management/todo.handlers.js";
-import { setupWorker } from "@socket.io/sticky";
+// import { setupPrimary, setupWorker } from "@socket.io/sticky";
+import stickyPkg from "@socket.io/sticky";
+const { setupPrimary, setupWorker } = stickyPkg;
 import { createAdapter } from "@socket.io/postgres-adapter";
 
 export function createApplication(httpServer, components, serverOptions = {}) {
   const io = new Server(httpServer, serverOptions);
+  // setupPrimary(io);
 
   const { createTodo, readTodo, updateTodo, deleteTodo, listTodo } =
     createTodoHandlers(components);
@@ -18,7 +21,7 @@ export function createApplication(httpServer, components, serverOptions = {}) {
   });
 
   // enable sticky session in the cluster (to remove in standalone mode)
-  setupWorker(io);
+  // setupWorker(io);
 
   io.adapter(createAdapter(components.connectionPool));
 

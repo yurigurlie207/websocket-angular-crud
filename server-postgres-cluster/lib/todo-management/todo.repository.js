@@ -36,6 +36,8 @@ export class PostgresTodoRepository extends TodoRepository {
         tableName: "todos",
       }
     );
+
+
   }
 
   findAll() {
@@ -60,6 +62,8 @@ export class PostgresTodoRepository extends TodoRepository {
     return this.sequelize.transaction((transaction) => {
       return Todo.upsert(entity, { transaction });
     });
+
+
   }
 
   async deleteById(id) {
