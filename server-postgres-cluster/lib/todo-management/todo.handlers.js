@@ -12,6 +12,7 @@ const todoSchema = Joi.object({
     update: (schema) => schema.required(),
   }),
   title: Joi.string().max(256).required(),
+  priority: Joi.string().max(256).required(),
   completed: Joi.boolean().required(),
 });
 

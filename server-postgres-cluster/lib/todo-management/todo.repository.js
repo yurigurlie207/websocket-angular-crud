@@ -24,6 +24,9 @@ export class PostgresTodoRepository extends TodoRepository {
           primaryKey: true,
           allowNull: false,
         },
+        priority: {
+          type: DataTypes.STRING,
+        },
         title: {
           type: DataTypes.STRING,
         },
