@@ -4,7 +4,6 @@ import { Sequelize } from "sequelize";
 import pg from "pg";
 import { PostgresTodoRepository } from "./todo-management/todo.repository.js";
 
-
 //brought in for user management
 import express from "express";
 import { initUserModel } from "./user-management/user.model.js";
@@ -38,8 +37,10 @@ createApplication(
 );
 
 const main = async () => {
+  console.log('Starting server...');
   // create the tables if they do not exist already
   await sequelize.sync();
+  console.log('Database synced successfully');
 
   // create the table needed by the postgres adapter
   await connectionPool.query(`
@@ -49,26 +50,32 @@ const main = async () => {
         payload     bytea
     );
   `);
+  console.log('Socket.IO attachments table ready');
 
-  // uncomment when running in standalone mode
-  httpServer.listen(3000);
+  // Initialize User model
+  initUserModel(sequelize);
+
+  // Create separate Express server for REST endpoints
+  const app = express();
+  app.use(express.json());
+  app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+  });
+
+  // Registration endpoint
+  app.post("/register", registerUser);
+
+  // Start Express server on port 3001
+  app.listen(3001, () => {
+    console.log('Express server running on port 3001');
+  });
+
+  // Start Socket.IO server on port 3000
+  httpServer.listen(3000, () => {
+    console.log('Socket.IO server running on port 3000');
+  });
 };
-
-//************************************** 
-//**** THIS IS THE USER MODEL BIT ******
-// const app = express();
-// app.use(express.json());
-
-// // Initialize User model
-// initUserModel(sequelize);
-
-// // Registration endpoint
-// app.post("/register", registerUser);
-
-
-// // Start both HTTP servers
-// httpServer.on("request", app);
-//**** END OF USER MODEL BIT ******
-//**************************************
 
 main();

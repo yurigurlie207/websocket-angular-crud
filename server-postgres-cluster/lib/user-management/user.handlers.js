@@ -4,13 +4,29 @@ import { User } from "./user.model.js";
 
 // Register function
 export const registerUser = async (req, res) => {
+  console.log('Registration request received:', req.body);
   const { username, password } = req.body;
-  if (!username || !password) return res.status(400).send("Missing fields");
-  const existing = await User.findOne({ where: { username } });
-  if (existing) return res.status(400).send("User exists");
-  const passwordHash = bcrypt.hashSync(password, 10);
-  await User.create({ username, passwordHash });
-  res.send("Registered");
+  if (!username || !password) {
+    console.log('Missing fields');
+    return res.status(400).json({ error: "Missing fields" });
+  }
+  
+  try {
+    const existing = await User.findOne({ where: { username } });
+    if (existing) {
+      console.log('User already exists:', username);
+      return res.status(400).json({ error: "User exists" });
+    }
+    
+    const passwordHash = bcrypt.hashSync(password, 10);
+    console.log('Creating user:', username);
+    await User.create({ username, passwordHash });
+    console.log('User created successfully:', username);
+    res.json({ message: "Registered successfully" });
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(500).json({ error: "Database error" });
+  }
 };
 
 // Login function
