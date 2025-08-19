@@ -3,6 +3,7 @@ import { ClientEvents, ServerEvents } from "../../../common/events";
 import { environment } from '../environments/environment';
 import {Injectable} from "@angular/core";
 
+
 export interface Todo {
   id: string,
   title: string,
@@ -26,7 +27,7 @@ export class TodoStore {
   private socket: Socket<ServerEvents, ClientEvents>;
 
   constructor() {
-    this.socket = io(environment.serverUrl);
+    this.socket = io(environment.socketUrl);
 
     this.socket.on("connect", () => {
       this.socket.emit("todo:list", (res) => {

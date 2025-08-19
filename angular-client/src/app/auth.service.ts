@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { catchError, Observable } from 'rxjs';
+import { environment } from '../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -8,15 +9,26 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
   
-  register(userData: { username: string; email?: string; password: string }) {
-    return this.http.post('http://localhost:3000/register', userData);
+  // register(userData: { username: string; password: string }) {
+  //   return this.http.post('http://localhost:3000/register', userData);
+  // }
+  register(userData: { username: string; password: string }): Observable<any> {
+    console.log('Making request to /register with:', userData);
+    return this.http.post(`${environment.serverUrl}/register`, userData, { 
+      responseType: 'text' 
+    }).pipe(
+      catchError(error => {
+        console.error('HTTP Error:', error);
+        throw error;
+      })
+    );
   }
 
   /**
    * Sends login request to backend and expects a JWT token in response.
    */
   login(username: string, password: string): Observable<{ token: string }> {
-    return this.http.post<{ token: string }>('http://localhost:3000/login', { username, password });
+    return this.http.post<{ token: string }>('http://localhost:3001/login', { username, password });
   }
 
   /**

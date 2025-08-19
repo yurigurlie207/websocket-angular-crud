@@ -1,3 +1,5 @@
 export const environment = {
-  serverUrl: "https://my-custom-domain.com"
+  production: false,
+  serverUrl: "http://localhost:3001",  // For REST endpoints (register, login)
+  socketUrl: "http://localhost:3000"   // For WebSocket connections (todos)
 };
