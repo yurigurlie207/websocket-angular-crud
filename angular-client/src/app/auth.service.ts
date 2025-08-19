@@ -6,12 +6,10 @@ import { environment } from '../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly TOKEN_KEY = 'token';
+  private readonly USERNAME_KEY = 'username';
 
   constructor(private http: HttpClient) {}
   
-  // register(userData: { username: string; password: string }) {
-  //   return this.http.post('http://localhost:3000/register', userData);
-  // }
   register(userData: { username: string; password: string }): Observable<any> {
     console.log('Making request to /register with:', userData);
     return this.http.post(`${environment.serverUrl}/register`, userData, { 
@@ -28,7 +26,13 @@ export class AuthService {
    * Sends login request to backend and expects a JWT token in response.
    */
   login(username: string, password: string): Observable<{ token: string }> {
-    return this.http.post<{ token: string }>('http://localhost:3001/login', { username, password });
+    console.log('Making login request for user:', username);
+    return this.http.post<{ token: string }>(`${environment.serverUrl}/login`, { username, password }).pipe(
+      catchError(error => {
+        console.error('Login HTTP Error:', error);
+        throw error;
+      })
+    );
   }
 
   /**
@@ -36,6 +40,7 @@ export class AuthService {
    */
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.USERNAME_KEY);
   }
 
   /**
@@ -57,5 +62,19 @@ export class AuthService {
    */
   setToken(token: string): void {
     localStorage.setItem(this.TOKEN_KEY, token);
+  }
+
+  /**
+   * Stores the username in localStorage.
+   */
+  setUsername(username: string): void {
+    localStorage.setItem(this.USERNAME_KEY, username);
+  }
+
+  /**
+   * Returns the username from localStorage, or null if not present.
+   */
+  getUsername(): string | null {
+    return localStorage.getItem(this.USERNAME_KEY);
   }
 } 

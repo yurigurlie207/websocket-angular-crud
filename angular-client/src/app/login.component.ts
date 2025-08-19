@@ -14,24 +14,32 @@ import { AuthService } from './auth.service';
 })
 
 export class LoginComponent {
-//  @ViewChild(AppComponent) childComponent!: AppComponent;
-
   username = '';
   password = '';
   error = '';
+  success = '';
 
   constructor(private auth: AuthService, private router: Router) {}
 
   login() {
+    console.log('Login attempt for user:', this.username);
+    this.error = '';
+    this.success = '';
+    
     this.auth.login(this.username, this.password).subscribe({
       next: (response) => {
+        console.log('Login successful:', response);
         this.auth.setToken(response.token);
-        this.router.navigate(['/']); // Redirect to main page or todos
+        this.auth.setUsername(this.username); // Store the username
+        this.success = 'Login successful! Redirecting...';
+        setTimeout(() => {
+          this.router.navigate(['/todos']); // Redirect to todos page
+        }, 1000);
       },
       error: (err) => {
-        this.error = err.error || 'Login failed';
+        console.error('Login error:', err);
+        this.error = err.error?.error || 'Login failed';
       }
     });
   }
-
 }
