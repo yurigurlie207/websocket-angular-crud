@@ -24,6 +24,14 @@ export class PostgresTodoRepository extends TodoRepository {
           primaryKey: true,
           allowNull: false,
         },
+        createdBy: {
+          type: DataTypes.STRING,
+          allowNull: false,
+        },
+        assignedTo: {
+          type: DataTypes.STRING,
+          allowNull: false,
+        },
         priority: {
           type: DataTypes.STRING,
         },
@@ -45,7 +53,9 @@ export class PostgresTodoRepository extends TodoRepository {
 
   findAll() {
     return this.sequelize.transaction((transaction) => {
-      return Todo.findAll({ transaction });
+      return Todo.findAll({ 
+        transaction 
+      });
     });
   }
 
@@ -71,7 +81,10 @@ export class PostgresTodoRepository extends TodoRepository {
 
   async deleteById(id) {
     return this.sequelize.transaction(async (transaction) => {
-      const count = await Todo.destroy({ where: { id }, transaction });
+      const count = await Todo.destroy({ 
+        where: { id }, 
+        transaction 
+      });
 
       if (count === 0) {
         throw Errors.ENTITY_NOT_FOUND;

@@ -11,6 +11,8 @@ const todoSchema = Joi.object({
     create: (schema) => schema.forbidden(),
     update: (schema) => schema.required(),
   }),
+  createdBy: Joi.string().optional(),
+  assignedTo: Joi.string().optional(),
   title: Joi.string().max(256).required(),
   priority: Joi.string().max(256).required(),
   completed: Joi.boolean().required(),
@@ -21,6 +23,13 @@ export default function (components) {
   return {
     createTodo: async function (payload, callback) {
       const socket = this;
+      const userId = socket.data?.user?.username;
+
+      if (!userId) {
+        return callback({
+          error: "Authentication required",
+        });
+      }
 
       // validate the payload
       const { error, value } = todoSchema.tailor("create").validate(payload, {
@@ -36,6 +45,14 @@ export default function (components) {
       }
 
       value.id = uuid();
+      // Use provided createdBy or default to current user
+      if (!value.createdBy) {
+        value.createdBy = userId;
+      }
+      // If assignedTo is not provided, default to the creator
+      if (!value.assignedTo) {
+        value.assignedTo = userId;
+      }
 
       // persist the entity
       try {
@@ -56,6 +73,15 @@ export default function (components) {
     },
 
     readTodo: async function (id, callback) {
+      const socket = this;
+      const userId = socket.data?.user?.username;
+
+      if (!userId) {
+        return callback({
+          error: "Authentication required",
+        });
+      }
+
       const { error } = idSchema.validate(id);
 
       if (error) {
@@ -78,6 +104,13 @@ export default function (components) {
 
     updateTodo: async function (payload, callback) {
       const socket = this;
+      const userId = socket.data?.user?.username;
+
+      if (!userId) {
+        return callback({
+          error: "Authentication required",
+        });
+      }
 
       const { error, value } = todoSchema.tailor("update").validate(payload, {
         abortEarly: false,
@@ -105,6 +138,13 @@ export default function (components) {
 
     deleteTodo: async function (id, callback) {
       const socket = this;
+      const userId = socket.data?.user?.username;
+
+      if (!userId) {
+        return callback({
+          error: "Authentication required",
+        });
+      }
 
       const { error } = idSchema.validate(id);
 
@@ -127,6 +167,15 @@ export default function (components) {
     },
 
     listTodo: async function (callback) {
+      const socket = this;
+      const userId = socket.data?.user?.username;
+
+      if (!userId) {
+        return callback({
+          error: "Authentication required",
+        });
+      }
+
       try {
         callback({
           data: await todoRepository.findAll(),

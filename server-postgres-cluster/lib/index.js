@@ -2,12 +2,31 @@ import { createServer } from "http";
 import { createApplication } from "./app.js";
 import { Sequelize } from "sequelize";
 import pg from "pg";
+import jwt from "jsonwebtoken";
 import { PostgresTodoRepository } from "./todo-management/todo.repository.js";
+import { PostgresUserRepository } from "./user-management/user.repository.js";
 
 //brought in for user management
 import express from "express";
-import { initUserModel } from "./user-management/user.model.js";
-import { registerUser } from "./user-management/user.handlers.js";
+import createUserHandlers from "./user-management/user.handlers.js";
+
+// JWT middleware for authentication
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Access token required' });
+  }
+
+  try {
+    const user = jwt.verify(token, 'SECRET_KEY');
+    req.user = user;
+    next();
+  } catch (err) {
+    return res.status(403).json({ error: 'Invalid token' });
+  }
+};
 
 const httpServer = createServer();
 
@@ -28,6 +47,7 @@ createApplication(
   {
     connectionPool,
     todoRepository: new PostgresTodoRepository(sequelize),
+    userRepository: new PostgresUserRepository(sequelize),
   },
   {
     cors: {
@@ -38,6 +58,7 @@ createApplication(
 
 const main = async () => {
   console.log('Starting server...');
+
   // create the tables if they do not exist already
   await sequelize.sync();
   console.log('Database synced successfully');
@@ -52,8 +73,10 @@ const main = async () => {
   `);
   console.log('Socket.IO attachments table ready');
 
-  // Initialize User model
-  initUserModel(sequelize);
+  // Create user handlers with repository
+  const userHandlers = createUserHandlers({
+    userRepository: new PostgresUserRepository(sequelize)
+  });
 
   // Create separate Express server for REST endpoints
   const app = express();
@@ -65,7 +88,22 @@ const main = async () => {
   });
 
   // Registration endpoint
-  app.post("/register", registerUser);
+  app.post("/register", userHandlers.registerUser);
+  
+  // Login endpoint
+  app.post("/login", userHandlers.loginUser);
+
+  // User preferences endpoints
+  app.get("/user/preferences", authenticateToken, userHandlers.getUserPreferences);
+  app.put("/user/preferences", authenticateToken, userHandlers.updateUserPreferences);
+
+  // Get all users (for todo assignment)
+  app.get("/users", authenticateToken, userHandlers.getAllUsers);
+
+  // Health check endpoint
+  app.get("/health", (req, res) => {
+    res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  });
 
   // Start Express server on port 3001
   app.listen(3001, () => {
