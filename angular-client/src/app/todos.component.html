@@ -3,6 +3,7 @@
     <h1>Todo App</h1>
     <div class="user-info">
       <span class="username">Welcome, {{ getCurrentUsername() }}!</span>
+      <button (click)="goToProfile()" class="profile-btn">Profile</button>
       <button (click)="logout()" class="logout-btn">Logout</button>
     </div>
   </header>
@@ -18,14 +19,25 @@
         <li *ngFor="let todo of todoStore.todos" [class.completed]="todo.completed" [class.editing]="todo.editing">
           <div class="view">
             <input class="toggle" type="checkbox" (click)="toggleCompletion(todo)" [checked]="todo.completed">
-            <label>
-              <select [(ngModel)]="todo.priority" (ngModelChange)="updatePriority(todo)" [class.highlightRed]="todo.priority === 'Hi-Pri'">
-                <option value="Hi-Pri">Hi-Pri</option>
-                <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
-              </select>
-            </label>
-            <label (dblclick)="editTodo(todo)">{{todo.title}}</label>
+            <div class="todo-info">
+              <div class="todo-header">
+                <label (dblclick)="editTodo(todo)">{{todo.title}}</label>
+                <div class="todo-meta">
+                  <span class="created-by">Created by: {{todo.createdBy}}</span>
+                  <span class="assigned-to">Assigned to: {{todo.assignedTo}}</span>
+                </div>
+              </div>
+              <div class="todo-controls">
+                <select [(ngModel)]="todo.priority" (ngModelChange)="updatePriority(todo)" [class.highlightRed]="todo.priority === 'Hi-Pri'">
+                  <option value="Hi-Pri">Hi-Pri</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Low">Low</option>
+                </select>
+                <select [(ngModel)]="todo.assignedTo" (ngModelChange)="updateAssignment(todo)" class="assignment-select">
+                  <option *ngFor="let user of availableUsers" [value]="user.username">{{user.username}}</option>
+                </select>
+              </div>
+            </div>
             <button class="destroy" (click)="remove(todo)"></button>
           </div>
           <input class="edit" *ngIf="todo.editing" [value]="todo.title" #editedtodo (blur)="stopEditing(todo, editedtodo.value)" (keyup.enter)="updateEditingTodo(todo, editedtodo.value)" (keyup.escape)="cancelEditingTodo(todo)">

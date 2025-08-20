@@ -1,3 +1,6 @@
+/* Import the existing todo styles */
+@import '../styles.css';
+
 .todo-app {
   max-width: 800px;
   margin: 0 auto;
@@ -22,6 +25,20 @@ header {
   color: #333;
 }
 
+.profile-btn {
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.profile-btn:hover {
+  background-color: #1976d2;
+}
+
 .logout-btn {
   background-color: #f44336;
   color: white;
@@ -35,5 +52,60 @@ header {
   background-color: #d32f2f;
 }
 
-/* Import the existing todo styles */
-@import '../styles.css'; 
+/* New styles for todo info layout */
+.todo-info {
+  flex: 1;
+  margin-left: 10px;
+}
+
+.todo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 5px;
+}
+
+.todo-header label {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.todo-meta {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8rem;
+  color: #666;
+  min-width: 150px;
+}
+
+.created-by, .assigned-to {
+  margin-bottom: 2px;
+}
+
+.todo-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.assignment-select {
+  padding: 2px 5px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  font-size: 0.9rem;
+}
+
+.view {
+  display: flex;
+  align-items: flex-start;
+  padding: 10px 0;
+}
+
+.toggle {
+  margin-right: 10px;
+  margin-top: 3px;
+}
+
+.destroy {
+  margin-left: 10px;
+} 

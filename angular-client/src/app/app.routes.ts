@@ -4,5 +4,6 @@ export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', loadComponent: () => import('./login.component').then(m => m.LoginComponent) },
   { path: 'register', loadComponent: () => import('./registration.component').then(m => m.RegistrationComponent) },
-  { path: 'todos', loadComponent: () => import('./todos.component').then(m => m.TodosComponent) }
+  { path: 'todos', loadComponent: () => import('./todos.component').then(m => m.TodosComponent) },
+  { path: 'profile', loadComponent: () => import('./profile.component').then(m => m.ProfileComponent) }
 ];

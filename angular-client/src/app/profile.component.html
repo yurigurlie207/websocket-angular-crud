@@ -1,0 +1,208 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <h1>User Profile</h1>
+    <div class="user-info">
+      <div class="avatar">
+        <span>{{ username.charAt(0).toUpperCase() }}</span>
+      </div>
+      <div class="user-details">
+        <h2>{{ username }}</h2>
+        <p class="user-status">Active User</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-content">
+    <!-- Success/Error Messages -->
+    <div *ngIf="success" class="alert alert-success">
+      {{ success }}
+    </div>
+    <div *ngIf="error" class="alert alert-error">
+      {{ error }}
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Loading preferences...</p>
+    </div>
+
+    <!-- Preferences Section -->
+    <div class="preferences-section" *ngIf="!loading">
+      <div class="section-header">
+        <h3>User Preferences</h3>
+        <button 
+          *ngIf="!isEditing" 
+          (click)="toggleEdit()" 
+          class="btn btn-primary">
+          Edit Preferences
+        </button>
+      </div>
+
+      <form class="preferences-form" (ngSubmit)="savePreferences()">
+        <div class="preferences-grid">
+          <!-- Notification Preferences -->
+          <div class="preference-group">
+            <h4>Notifications</h4>
+            
+            <div class="preference-item">
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="preferences.emailNotifications" 
+                  name="emailNotifications"
+                  [disabled]="!isEditing">
+                <span class="checkmark"></span>
+                <div class="preference-text">
+                  <span class="preference-title">Email Notifications</span>
+                  <span class="preference-description">Receive updates via email</span>
+                </div>
+              </label>
+            </div>
+
+            <div class="preference-item">
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="preferences.pushNotifications" 
+                  name="pushNotifications"
+                  [disabled]="!isEditing">
+                <span class="checkmark"></span>
+                <div class="preference-text">
+                  <span class="preference-title">Push Notifications</span>
+                  <span class="preference-description">Receive browser notifications</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Display Preferences -->
+          <div class="preference-group">
+            <h4>Display & Interface</h4>
+            
+            <div class="preference-item">
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="preferences.darkMode" 
+                  name="darkMode"
+                  [disabled]="!isEditing">
+                <span class="checkmark"></span>
+                <div class="preference-text">
+                  <span class="preference-title">Dark Mode</span>
+                  <span class="preference-description">Use dark theme interface</span>
+                </div>
+              </label>
+            </div>
+
+            <div class="preference-item">
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="preferences.autoSave" 
+                  name="autoSave"
+                  [disabled]="!isEditing">
+                <span class="checkmark"></span>
+                <div class="preference-text">
+                  <span class="preference-title">Auto Save</span>
+                  <span class="preference-description">Automatically save changes</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Privacy Preferences -->
+          <div class="preference-group">
+            <h4>Privacy & Security</h4>
+            
+            <div class="preference-item">
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="preferences.publicProfile" 
+                  name="publicProfile"
+                  [disabled]="!isEditing">
+                <span class="checkmark"></span>
+                <div class="preference-text">
+                  <span class="preference-title">Public Profile</span>
+                  <span class="preference-description">Allow others to view your profile</span>
+                </div>
+              </label>
+            </div>
+
+            <div class="preference-item">
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="preferences.twoFactorAuth" 
+                  name="twoFactorAuth"
+                  [disabled]="!isEditing">
+                <span class="checkmark"></span>
+                <div class="preference-text">
+                  <span class="preference-title">Two-Factor Authentication</span>
+                  <span class="preference-description">Enable additional security</span>
+                </div>
+              </label>
+            </div>
+
+            <div class="preference-item">
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="preferences.locationSharing" 
+                  name="locationSharing"
+                  [disabled]="!isEditing">
+                <span class="checkmark"></span>
+                <div class="preference-text">
+                  <span class="preference-title">Location Sharing</span>
+                  <span class="preference-description">Share your location with the app</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Communication Preferences -->
+          <div class="preference-group">
+            <h4>Communication</h4>
+            
+            <div class="preference-item">
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="preferences.newsletter" 
+                  name="newsletter"
+                  [disabled]="!isEditing">
+                <span class="checkmark"></span>
+                <div class="preference-text">
+                  <span class="preference-title">Newsletter</span>
+                  <span class="preference-description">Receive our monthly newsletter</span>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-actions" *ngIf="isEditing">
+          <button type="button" (click)="toggleEdit()" class="btn btn-secondary">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="loading">
+            <span *ngIf="loading">Saving...</span>
+            <span *ngIf="!loading">Save Preferences</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Navigation Footer -->
+  <div class="profile-footer">
+    <button (click)="goToTodos()" class="btn btn-outline">
+      Go to Todos
+    </button>
+    <button (click)="logout()" class="btn btn-danger">
+      Logout
+    </button>
+  </div>
+</div>

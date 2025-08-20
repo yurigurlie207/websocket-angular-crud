@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { type Todo, TodoStore } from "./store";
 import { AuthService } from './auth.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-todos',
@@ -11,16 +13,38 @@ import { AuthService } from './auth.service';
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './todos.component.html',
   styleUrl: './todos.component.css',
-  providers: [TodoStore]
+  providers: [TodoStore, AuthService]
 })
-export class TodosComponent {
+export class TodosComponent implements OnInit {
   newTodoText = new FormControl('');
+  availableUsers: Array<{username: string}> = [];
 
   constructor(
     readonly todoStore: TodoStore,
     private auth: AuthService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) {}
+
+  ngOnInit() {
+    this.loadAvailableUsers();
+  }
+
+  loadAvailableUsers() {
+    const token = this.auth.getToken();
+    if (token) {
+      this.http.get<Array<{username: string}>>(`${environment.serverUrl}/users`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      }).subscribe({
+        next: (users) => {
+          this.availableUsers = users;
+        },
+        error: (err) => {
+          console.error('Error loading users:', err);
+        }
+      });
+    }
+  }
 
   getCurrentUsername(): string {
     return this.auth.getUsername() || 'Unknown User';
@@ -52,6 +76,10 @@ export class TodosComponent {
     this.todoStore.update(todo);
   }
 
+  updateAssignment(todo: Todo) {
+    this.todoStore.update(todo);
+  }
+
   editTodo(todo: Todo) {
     todo.editing = true;
   }
@@ -78,5 +106,9 @@ export class TodosComponent {
   logout() {
     this.auth.logout();
     this.router.navigate(['/login']);
+  }
+
+  goToProfile() {
+    this.router.navigate(['/profile']);
   }
 } 

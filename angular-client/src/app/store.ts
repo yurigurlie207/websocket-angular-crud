@@ -2,15 +2,27 @@ import { io, Socket } from "socket.io-client";
 import { ClientEvents, ServerEvents } from "../../../common/events";
 import { environment } from '../environments/environment';
 import {Injectable} from "@angular/core";
+import { AuthService } from './auth.service';
 
 
 export interface Todo {
   id: string,
+  createdBy: string,
+  assignedTo: string,
   title: string,
   priority: string,
   completed: boolean,
   editing: boolean,
   synced: boolean
+}
+
+// Interface for server communication
+interface TodoPayload {
+  title: string,
+  priority: string,
+  completed: boolean,
+  createdBy?: string,
+  assignedTo?: string
 }
 
 const mapTodo = (todo: any) => {
@@ -26,8 +38,17 @@ export class TodoStore {
   public todos: Array<Todo> = [];
   private socket: Socket<ServerEvents, ClientEvents>;
 
-  constructor() {
-    this.socket = io(environment.socketUrl);
+  constructor(private authService: AuthService) {
+    const token = this.authService.getToken();
+    if (!token) {
+      throw new Error('No authentication token available');
+    }
+
+    this.socket = io(environment.socketUrl, {
+      auth: {
+        token: token
+      }
+    });
 
     this.socket.on("connect", () => {
       this.socket.emit("todo:list", (res) => {
@@ -139,14 +160,27 @@ export class TodoStore {
     });
   }
 
-  add(title: string) {
-    this.socket.emit("todo:create", { title, priority: "Hi-Pri", completed: false }, (res) => {
+  add(title: string, assignedTo?: string) {
+    const currentUser = this.authService.getUsername() || '';
+    const assignedUser = assignedTo || currentUser;
+    
+    const todoPayload: TodoPayload = { 
+      title, 
+      priority: "Hi-Pri", 
+      completed: false,
+      createdBy: currentUser,
+      assignedTo: assignedUser
+    };
+    
+    this.socket.emit("todo:create", todoPayload, (res) => {
       if ("error" in res) {
         // handle the error
         return;
       }
       this.todos.push({
         id: res.data,
+        createdBy: currentUser,
+        assignedTo: assignedUser,
         title,
         priority: "Hi-Pri",
         completed: false,
