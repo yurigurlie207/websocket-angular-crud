@@ -32,15 +32,24 @@ export class TodosComponent implements OnInit {
 
   loadAvailableUsers() {
     const token = this.auth.getToken();
+    console.log('Loading available users, token:', token ? 'present' : 'missing');
     if (token) {
+      console.log('Token value:', token);
+      console.log('Making request to:', `${environment.serverUrl}/users`);
+      const headers = { 'Authorization': `Bearer ${token}` };
+      console.log('Request headers:', headers);
       this.http.get<Array<{username: string}>>(`${environment.serverUrl}/users`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: headers
       }).subscribe({
         next: (users) => {
+          console.log('Users loaded successfully:', users);
           this.availableUsers = users;
         },
         error: (err) => {
           console.error('Error loading users:', err);
+          console.error('Error status:', err.status);
+          console.error('Error message:', err.message);
+          console.error('Error details:', err);
         }
       });
     }

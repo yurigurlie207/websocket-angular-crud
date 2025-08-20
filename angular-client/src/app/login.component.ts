@@ -29,8 +29,11 @@ export class LoginComponent {
     this.auth.login(this.username, this.password).subscribe({
       next: (response) => {
         console.log('Login successful:', response);
+        console.log('Token received:', response.token);
         this.auth.setToken(response.token);
         this.auth.setUsername(this.username); // Store the username
+        console.log('Token stored, checking localStorage...');
+        console.log('Stored token:', localStorage.getItem('token'));
         this.success = 'Login successful! Redirecting...';
         setTimeout(() => {
           this.router.navigate(['/todos']); // Redirect to todos page
