@@ -13,9 +13,8 @@ if (cluster.isMaster) {
 
   httpServer.listen(3000);
 
-  for (let i = 0; i < cpus().length; i++) {
-    cluster.fork();
-  }
+  // Only run one worker for now to debug
+  cluster.fork();
 
   cluster.on("exit", (worker) => {
     console.log(`Worker ${worker.process.pid} died`);
@@ -24,5 +23,14 @@ if (cluster.isMaster) {
 } else {
   console.log(`Worker ${process.pid} started`);
 
-  import("./index.js");
+  try {
+    // Import and run the main application
+    console.log('Importing index.js...');
+    const { main } = await import("./index.js");
+    console.log('Main function imported, calling it...');
+    await main();
+    console.log('Main function completed');
+  } catch (error) {
+    console.error('Error in worker:', error);
+  }
 }

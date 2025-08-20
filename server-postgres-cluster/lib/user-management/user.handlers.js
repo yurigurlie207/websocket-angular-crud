@@ -120,8 +120,12 @@ export default function (components) {
     // Get all users (for todo assignment)
     getAllUsers: async (req, res) => {
       try {
+        console.log('Getting all users...');
         const users = await userRepository.findAll();
-        res.json(users.map(user => ({ username: user.username })));
+        console.log('Users found:', users);
+        const userList = users.map(user => ({ username: user.username }));
+        console.log('Sending user list:', userList);
+        res.json(userList);
       } catch (error) {
         console.error('Error getting users:', error);
         res.status(500).json({ error: 'Database error' });
