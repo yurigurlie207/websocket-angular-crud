@@ -37,14 +37,14 @@ export class PostgresUserRepository extends UserRepository {
           type: DataTypes.JSONB,
           allowNull: true,
           defaultValue: {
-            emailNotifications: false,
-            pushNotifications: false,
-            darkMode: false,
-            autoSave: true,
-            publicProfile: false,
-            newsletter: false,
-            twoFactorAuth: false,
-            locationSharing: false
+            petCare: false,
+            laundry: false,
+            cooking: false,
+            organization: true,
+            plantCare: false,
+            houseWork: false,
+            yardWork: false,
+            familyCare: false
           }
         }
       },

@@ -72,19 +72,22 @@ export default function (components) {
           return res.status(404).json({ error: 'User not found' });
         }
 
-        // Return user preferences or default preferences if none exist
+        // Define the new default preferences structure
         const defaultPreferences = {
-          emailNotifications: false,
-          pushNotifications: false,
-          darkMode: false,
-          autoSave: true,
-          publicProfile: false,
-          newsletter: false,
-          twoFactorAuth: false,
-          locationSharing: false
+          petCare: false,
+          laundry: false,
+          cooking: false,
+          organization: true,
+          plantCare: false,
+          houseWork: false,
+          yardWork: false,
+          familyCare: false
         };
 
-        res.json(user.preferences || defaultPreferences);
+        // Merge existing preferences with defaults to ensure all fields exist
+        const mergedPreferences = { ...defaultPreferences, ...user.preferences };
+
+        res.json(mergedPreferences);
       } catch (error) {
         console.error('Error getting preferences:', error);
         res.status(500).json({ error: 'Database error' });
@@ -106,11 +109,34 @@ export default function (components) {
           return res.status(404).json({ error: 'User not found' });
         }
 
-        // Update user preferences
-        user.preferences = { ...user.preferences, ...preferences };
-        await userRepository.save(user);
+        // Define the new default preferences structure
+        const defaultPreferences = {
+          petCare: false,
+          laundry: false,
+          cooking: false,
+          organization: true,
+          plantCare: false,
+          houseWork: false,
+          yardWork: false,
+          familyCare: false
+        };
 
-        res.json({ message: 'Preferences updated successfully', preferences: user.preferences });
+        // Merge with existing preferences, ensuring all new fields exist
+        const updatedPreferences = { ...defaultPreferences, ...user.preferences, ...preferences };
+        
+        // Update user preferences using direct Sequelize update
+        await userRepository.sequelize.transaction(async (transaction) => {
+          const User = userRepository.sequelize.models.User;
+          await User.update(
+            { preferences: updatedPreferences },
+            { 
+              where: { username: username },
+              transaction 
+            }
+          );
+        });
+
+        res.json({ message: 'Preferences updated successfully', preferences: updatedPreferences });
       } catch (error) {
         console.error('Error updating preferences:', error);
         res.status(500).json({ error: 'Database error' });
