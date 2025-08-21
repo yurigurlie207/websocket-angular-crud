@@ -30,7 +30,7 @@
     <!-- Preferences Section -->
     <div class="preferences-section" *ngIf="!loading">
       <div class="section-header">
-        <h3>User Preferences</h3>
+        <h3>Household Responsibilities</h3>
         <button 
           *ngIf="!isEditing" 
           (click)="toggleEdit()" 
@@ -41,21 +41,21 @@
 
       <form class="preferences-form" (ngSubmit)="savePreferences()">
         <div class="preferences-grid">
-          <!-- Notification Preferences -->
+          <!-- Pet & Plant Care -->
           <div class="preference-group">
-            <h4>Notifications</h4>
+            <h4>Pet & Plant Care</h4>
             
             <div class="preference-item">
               <label class="checkbox-label">
                 <input 
                   type="checkbox" 
-                  [(ngModel)]="preferences.emailNotifications" 
-                  name="emailNotifications"
+                  [(ngModel)]="preferences.petCare" 
+                  name="petCare"
                   [disabled]="!isEditing">
                 <span class="checkmark"></span>
                 <div class="preference-text">
-                  <span class="preference-title">Email Notifications</span>
-                  <span class="preference-description">Receive updates via email</span>
+                  <span class="preference-title">Pet Care</span>
+                  <span class="preference-description">Feeding, walking, and caring for pets</span>
                 </div>
               </label>
             </div>
@@ -64,33 +64,33 @@
               <label class="checkbox-label">
                 <input 
                   type="checkbox" 
-                  [(ngModel)]="preferences.pushNotifications" 
-                  name="pushNotifications"
+                  [(ngModel)]="preferences.plantCare" 
+                  name="plantCare"
                   [disabled]="!isEditing">
                 <span class="checkmark"></span>
                 <div class="preference-text">
-                  <span class="preference-title">Push Notifications</span>
-                  <span class="preference-description">Receive browser notifications</span>
+                  <span class="preference-title">Plant Care</span>
+                  <span class="preference-description">Watering and maintaining house plants</span>
                 </div>
               </label>
             </div>
           </div>
 
-          <!-- Display Preferences -->
+          <!-- Household Chores -->
           <div class="preference-group">
-            <h4>Display & Interface</h4>
+            <h4>Household Chores</h4>
             
             <div class="preference-item">
               <label class="checkbox-label">
                 <input 
                   type="checkbox" 
-                  [(ngModel)]="preferences.darkMode" 
-                  name="darkMode"
+                  [(ngModel)]="preferences.laundry" 
+                  name="laundry"
                   [disabled]="!isEditing">
                 <span class="checkmark"></span>
                 <div class="preference-text">
-                  <span class="preference-title">Dark Mode</span>
-                  <span class="preference-description">Use dark theme interface</span>
+                  <span class="preference-title">Laundry</span>
+                  <span class="preference-description">Washing, drying, and folding clothes</span>
                 </div>
               </label>
             </div>
@@ -99,33 +99,48 @@
               <label class="checkbox-label">
                 <input 
                   type="checkbox" 
-                  [(ngModel)]="preferences.autoSave" 
-                  name="autoSave"
+                  [(ngModel)]="preferences.cooking" 
+                  name="cooking"
                   [disabled]="!isEditing">
                 <span class="checkmark"></span>
                 <div class="preference-text">
-                  <span class="preference-title">Auto Save</span>
-                  <span class="preference-description">Automatically save changes</span>
+                  <span class="preference-title">Cooking</span>
+                  <span class="preference-description">Meal preparation and kitchen duties</span>
+                </div>
+              </label>
+            </div>
+
+            <div class="preference-item">
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="preferences.houseWork" 
+                  name="houseWork"
+                  [disabled]="!isEditing">
+                <span class="checkmark"></span>
+                <div class="preference-text">
+                  <span class="preference-title">House Work</span>
+                  <span class="preference-description">Cleaning, dusting, and general maintenance</span>
                 </div>
               </label>
             </div>
           </div>
 
-          <!-- Privacy Preferences -->
+          <!-- Organization & Family -->
           <div class="preference-group">
-            <h4>Privacy & Security</h4>
+            <h4>Organization & Family</h4>
             
             <div class="preference-item">
               <label class="checkbox-label">
                 <input 
                   type="checkbox" 
-                  [(ngModel)]="preferences.publicProfile" 
-                  name="publicProfile"
+                  [(ngModel)]="preferences.organization" 
+                  name="organization"
                   [disabled]="!isEditing">
                 <span class="checkmark"></span>
                 <div class="preference-text">
-                  <span class="preference-title">Public Profile</span>
-                  <span class="preference-description">Allow others to view your profile</span>
+                  <span class="preference-title">Organization</span>
+                  <span class="preference-description">Keeping things tidy and organized</span>
                 </div>
               </label>
             </div>
@@ -134,48 +149,33 @@
               <label class="checkbox-label">
                 <input 
                   type="checkbox" 
-                  [(ngModel)]="preferences.twoFactorAuth" 
-                  name="twoFactorAuth"
+                  [(ngModel)]="preferences.familyCare" 
+                  name="familyCare"
                   [disabled]="!isEditing">
                 <span class="checkmark"></span>
                 <div class="preference-text">
-                  <span class="preference-title">Two-Factor Authentication</span>
-                  <span class="preference-description">Enable additional security</span>
-                </div>
-              </label>
-            </div>
-
-            <div class="preference-item">
-              <label class="checkbox-label">
-                <input 
-                  type="checkbox" 
-                  [(ngModel)]="preferences.locationSharing" 
-                  name="locationSharing"
-                  [disabled]="!isEditing">
-                <span class="checkmark"></span>
-                <div class="preference-text">
-                  <span class="preference-title">Location Sharing</span>
-                  <span class="preference-description">Share your location with the app</span>
+                  <span class="preference-title">Family Care</span>
+                  <span class="preference-description">Caring for family members and children</span>
                 </div>
               </label>
             </div>
           </div>
 
-          <!-- Communication Preferences -->
+          <!-- Outdoor Work -->
           <div class="preference-group">
-            <h4>Communication</h4>
+            <h4>Outdoor & Maintenance</h4>
             
             <div class="preference-item">
               <label class="checkbox-label">
                 <input 
                   type="checkbox" 
-                  [(ngModel)]="preferences.newsletter" 
-                  name="newsletter"
+                  [(ngModel)]="preferences.yardWork" 
+                  name="yardWork"
                   [disabled]="!isEditing">
                 <span class="checkmark"></span>
                 <div class="preference-text">
-                  <span class="preference-title">Newsletter</span>
-                  <span class="preference-description">Receive our monthly newsletter</span>
+                  <span class="preference-title">Yard Work</span>
+                  <span class="preference-description">Gardening, mowing, and outdoor maintenance</span>
                 </div>
               </label>
             </div>

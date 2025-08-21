@@ -1,6 +1,5 @@
 <div class="todo-app">
   <header>
-    <h1>Todo App</h1>
     <div class="user-info">
       <span class="username">Welcome, {{ getCurrentUsername() }}!</span>
       <button (click)="goToProfile()" class="profile-btn">Profile</button>
@@ -11,7 +10,12 @@
   <section class="todoapp">
     <header class="header">
       <h1>todos</h1>
-      <input class="new-todo" placeholder="What needs to be done?" autofocus="" [formControl]="newTodoText" (keyup.enter)="addTodo()">
+      <div class="add-todo-container">
+        <input class="new-todo" placeholder="What needs to be done?" autofocus="" [formControl]="newTodoText" (keyup.enter)="addTodo()">
+        <button class="add-todo-btn" (click)="addTodo()" [disabled]="!newTodoText.value?.trim()">
+          <span>Add</span>
+        </button>
+      </div>
     </header>
     <section class="main" *ngIf="todoStore.todos.length > 0">
       <input id="toggle-all" class="toggle-all" type="checkbox" *ngIf="todoStore.todos.length" #toggleall [checked]="todoStore.allCompleted()" (click)="todoStore.setAllTo(toggleall.checked)">

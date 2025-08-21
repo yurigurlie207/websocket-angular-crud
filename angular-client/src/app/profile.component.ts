@@ -7,14 +7,14 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../environments/environment';
 
 interface UserPreferences {
-  emailNotifications: boolean;
-  pushNotifications: boolean;
-  darkMode: boolean;
-  autoSave: boolean;
-  publicProfile: boolean;
-  newsletter: boolean;
-  twoFactorAuth: boolean;
-  locationSharing: boolean;
+  petCare: boolean;
+  laundry: boolean;
+  cooking: boolean;
+  organization: boolean;
+  plantCare: boolean;
+  houseWork: boolean;
+  yardWork: boolean;
+  familyCare: boolean;
 }
 
 @Component({
@@ -27,14 +27,14 @@ interface UserPreferences {
 export class ProfileComponent implements OnInit {
   username: string = '';
   preferences: UserPreferences = {
-    emailNotifications: false,
-    pushNotifications: false,
-    darkMode: false,
-    autoSave: true,
-    publicProfile: false,
-    newsletter: false,
-    twoFactorAuth: false,
-    locationSharing: false
+    petCare: false,
+    laundry: false,
+    cooking: false,
+    organization: true,
+    plantCare: false,
+    houseWork: false,
+    yardWork: false,
+    familyCare: false
   };
   
   isEditing = false;
