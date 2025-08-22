@@ -18,6 +18,21 @@
       </div>
     </header>
     <section class="main" *ngIf="todoStore.todos.length > 0">
+      <div class="ai-controls">
+        <button 
+          (click)="prioritizeWithAI()" 
+          class="ai-prioritize-btn"
+          [disabled]="isAILoading">
+          <span *ngIf="!isAILoading">🤖 AI Prioritize</span>
+          <span *ngIf="isAILoading">🤖 Analyzing...</span>
+        </button>
+      </div>
+      
+      <div *ngIf="aiInsights" class="ai-insights">
+        <h4>💡 AI Insights</h4>
+        <p>{{ aiInsights }}</p>
+      </div>
+      
       <input id="toggle-all" class="toggle-all" type="checkbox" *ngIf="todoStore.todos.length" #toggleall [checked]="todoStore.allCompleted()" (click)="todoStore.setAllTo(toggleall.checked)">
       <ul class="todo-list">
         <li *ngFor="let todo of todoStore.todos" [class.completed]="todo.completed" [class.editing]="todo.editing">
@@ -29,6 +44,10 @@
                 <div class="todo-meta">
                   <span class="created-by">Created by: {{todo.createdBy}}</span>
                   <span class="assigned-to">Assigned to: {{todo.assignedTo}}</span>
+                  <!-- AI Priority Indicator -->
+                  <span *ngIf="getAIPriority(todo)" class="ai-priority-badge" [title]="getAIReason(todo)">
+                    🤖 #{{ getAIPriority(todo) }}
+                  </span>
                 </div>
               </div>
               <div class="todo-controls">

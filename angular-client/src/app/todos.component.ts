@@ -6,6 +6,7 @@ import { type Todo, TodoStore } from "./store";
 import { AuthService } from './auth.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../environments/environment';
+import { ClaudeService, PrioritizedTodo, UserPreferences } from './claude.service';
 
 @Component({
   selector: 'app-todos',
@@ -18,16 +19,30 @@ import { environment } from '../environments/environment';
 export class TodosComponent implements OnInit {
   newTodoText = new FormControl('');
   availableUsers: Array<{username: string}> = [];
+  userPreferences: UserPreferences = {
+    petCare: false,
+    laundry: false,
+    cooking: false,
+    organization: true,
+    plantCare: false,
+    houseWork: false,
+    yardWork: false,
+    familyCare: false
+  };
+  aiInsights: string = '';
+  isAILoading: boolean = false;
 
   constructor(
     readonly todoStore: TodoStore,
     private auth: AuthService,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private claudeService: ClaudeService
   ) {}
 
   ngOnInit() {
     this.loadAvailableUsers();
+    this.loadUserPreferences();
   }
 
   loadAvailableUsers() {
@@ -119,5 +134,75 @@ export class TodosComponent implements OnInit {
 
   goToProfile() {
     this.router.navigate(['/profile']);
+  }
+
+  loadUserPreferences() {
+    const token = this.auth.getToken();
+    if (token) {
+      this.http.get<UserPreferences>(`${environment.serverUrl}/user/preferences`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      }).subscribe({
+        next: (preferences) => {
+          this.userPreferences = preferences;
+          // Get AI insights after loading preferences
+          this.getAIInsights();
+        },
+        error: (err) => {
+          console.error('Error loading user preferences:', err);
+        }
+      });
+    }
+  }
+
+  prioritizeWithAI() {
+    this.isAILoading = true;
+    const todos = this.todoStore.todos.filter(todo => !todo.completed);
+    
+    this.claudeService.prioritizeTodos(todos, this.userPreferences).subscribe({
+      next: (prioritizedTodos: PrioritizedTodo[]) => {
+        // Update todos with AI priority
+        prioritizedTodos.forEach(prioritizedTodo => {
+          const todo = this.todoStore.todos.find(t => t.id === prioritizedTodo.id);
+          if (todo) {
+            (todo as any).aiPriority = prioritizedTodo.aiPriority;
+            (todo as any).aiReason = prioritizedTodo.aiReason;
+          }
+        });
+        
+        // Sort todos by AI priority
+        this.todoStore.todos.sort((a, b) => {
+          const aPriority = (a as any).aiPriority || 999;
+          const bPriority = (b as any).aiPriority || 999;
+          return aPriority - bPriority;
+        });
+        
+        this.isAILoading = false;
+      },
+      error: (err) => {
+        console.error('Error prioritizing with AI:', err);
+        this.isAILoading = false;
+      }
+    });
+  }
+
+  getAIInsights() {
+    const todos = this.todoStore.todos.slice(-10); // Last 10 todos
+    
+    this.claudeService.getTaskInsights(todos, this.userPreferences).subscribe({
+      next: (insight: string) => {
+        this.aiInsights = insight;
+      },
+      error: (err) => {
+        console.error('Error getting AI insights:', err);
+      }
+    });
+  }
+
+  getAIPriority(todo: Todo): number | null {
+    return (todo as any).aiPriority || null;
+  }
+
+  getAIReason(todo: Todo): string | null {
+    return (todo as any).aiReason || null;
   }
 } 

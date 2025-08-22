@@ -260,6 +260,61 @@ header h1 {
   /* Proximity: Grouped content area */
 }
 
+/* AI Controls */
+.ai-controls {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.ai-prioritize-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.ai-prioritize-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.ai-prioritize-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* AI Insights */
+.ai-insights {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.ai-insights h4 {
+  color: #2c3e50;
+  margin: 0 0 1rem 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.ai-insights p {
+  color: #6c757d;
+  margin: 0;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
 /* Toggle All - Similarity */
 .toggle-all {
   margin-bottom: 2rem;
@@ -399,6 +454,25 @@ header h1 {
   border: 1px solid rgba(102, 126, 234, 0.2);
   /* Similarity: Consistent badge styling */
   /* Figure-Ground: Clear badges against background */
+}
+
+.ai-priority-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: help;
+  transition: all 0.2s ease;
+  border: none;
+  /* Similarity: Consistent with other badges */
+  /* Figure-Ground: Stands out as AI-powered */
+}
+
+.ai-priority-badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
 /* Todo Controls - Proximity & Similarity */
