@@ -7,8 +7,12 @@ import { PostgresTodoRepository } from "./todo-management/todo.repository.js";
 import { PostgresUserRepository } from "./user-management/user.repository.js";
 
 //brought in for user management
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from "express";
 import createUserHandlers from "./user-management/user.handlers.js";
+import createAIHandlers from "./ai/ai.handlers.js";
 
 // JWT middleware for authentication
 const authenticateToken = (req, res, next) => {
@@ -78,6 +82,9 @@ export const main = async () => {
     userRepository: new PostgresUserRepository(sequelize)
   });
 
+  // Create AI handlers
+  const aiHandlers = createAIHandlers({});
+
   // Create separate Express server for REST endpoints
   const app = express();
   app.use(express.json());
@@ -101,6 +108,10 @@ export const main = async () => {
 
   // Get all users (for todo assignment)
   app.get("/users", authenticateToken, userHandlers.getAllUsers);
+
+  // AI endpoints
+  app.post("/ai/prioritize", authenticateToken, aiHandlers.prioritizeTodos);
+  app.post("/ai/insights", authenticateToken, aiHandlers.getInsights);
 
   // Health check endpoint
   app.get("/health", (req, res) => {
