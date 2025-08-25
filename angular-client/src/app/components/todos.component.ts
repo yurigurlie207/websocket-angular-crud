@@ -129,11 +129,7 @@ export class TodosComponent implements OnInit {
     this.router.navigate(['/profile']);
   }
 
-  loadUserPreferences() {
-    // User preferences are now managed by the store
-    // Get AI insights after preferences are loaded
-    this.getAIInsights();
-  }
+  
 
   prioritizeWithAI() {
     this.isAILoading = true;
