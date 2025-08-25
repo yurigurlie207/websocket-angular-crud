@@ -32,6 +32,8 @@ export class TodosComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // Initialize the store if user is authenticated
+    this.todoStore.initializeIfAuthenticated();
     this.loadAvailableUsers();
     this.loadUserPreferences();
   }

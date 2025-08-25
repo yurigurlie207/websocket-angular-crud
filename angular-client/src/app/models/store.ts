@@ -57,22 +57,29 @@ export class TodoStore {
     yardWork: false,
     familyCare: false
   };
-  private socket: Socket<ServerEvents, ClientEvents>;
+  private socket?: Socket<ServerEvents, ClientEvents>;
 
   constructor(private authService: AuthService, private http: HttpClient) {
-    const token = this.authService.getToken();
-    if (!token) {
-      throw new Error('No authentication token available');
-    }
+    // Initialize when user is authenticated
+    this.initializeIfAuthenticated();
+  }
 
+  initializeIfAuthenticated() {
+    const token = this.authService.getToken();
+    if (token && !this.socket) {
+      this.initializeSocket(token);
+    }
+  }
+
+  private initializeSocket(token: string) {
     this.socket = io(environment.socketUrl, {
       auth: {
         token: token
       }
     });
 
-    this.socket.on("connect", () => {
-      this.socket.emit("todo:list", (res) => {
+    this.socket!.on("connect", () => {
+      this.socket!.emit("todo:list", (res) => {
         if ("error" in res) {
           // handle the error
           return;
@@ -120,6 +127,10 @@ export class TodoStore {
 
     // Load user preferences on initialization
     this.loadUserPreferences();
+  }
+
+  private isSocketInitialized(): boolean {
+    return this.socket !== undefined;
   }
 
   // User Preferences Management
@@ -171,10 +182,12 @@ export class TodoStore {
   }
 
   setAllTo(completed: boolean) {
+    if (!this.socket) return;
+    
     this.todos.forEach(todo => {
       todo.completed = completed;
       todo.synced = false;
-      this.socket.emit("todo:update", todo, (res) => {
+      this.socket!.emit("todo:update", todo, (res) => {
         if (res && "error" in res) {
           // handle the error
           return;
@@ -185,8 +198,10 @@ export class TodoStore {
   }
 
   removeCompleted() {
+    if (!this.socket) return;
+    
     this.getCompleted().forEach((todo) => {
-      this.socket.emit("todo:delete", todo.id, (res) => {
+      this.socket!.emit("todo:delete", todo.id, (res) => {
         if (res && "error" in res) {
           // handle the error
         }
@@ -204,9 +219,11 @@ export class TodoStore {
   }
 
   toggleCompletion(todo: Todo) {
+    if (!this.socket) return;
+    
     todo.completed = !todo.completed;
     todo.synced = false;
-    this.socket.emit("todo:update", todo, (res) => {
+    this.socket!.emit("todo:update", todo, (res) => {
       if (res && "error" in res) {
         // handle the error
         return;
@@ -216,8 +233,10 @@ export class TodoStore {
   }
 
   remove(todo: Todo) {
+    if (!this.socket) return;
+    
     this.todos.splice(this.todos.indexOf(todo), 1);
-    this.socket.emit("todo:delete", todo.id, (res) => {
+    this.socket!.emit("todo:delete", todo.id, (res) => {
       if (res && "error" in res) {
         // handle the error
       }
@@ -225,6 +244,8 @@ export class TodoStore {
   }
 
   add(title: string, assignedTo?: string) {
+    if (!this.socket) return;
+    
     const currentUser = this.authService.getUsername() || '';
     const assignedUser = assignedTo || currentUser;
     
@@ -236,7 +257,7 @@ export class TodoStore {
       assignedTo: assignedUser
     };
     
-    this.socket.emit("todo:create", todoPayload, (res) => {
+    this.socket!.emit("todo:create", todoPayload, (res) => {
       if ("error" in res) {
         // handle the error
         return;
@@ -266,7 +287,9 @@ export class TodoStore {
   }
 
   update(todo: Todo) {
-    this.socket.emit("todo:update", todo, (res) => {
+    if (!this.socket) return;
+    
+    this.socket!.emit("todo:update", todo, (res) => {
       if (res && "error" in res) {
         // handle the error
         return;
