@@ -125,6 +125,7 @@ export default function (components) {
           hasPrompt: !!prompt,
           apiKey: CLAUDE_API_KEY ? 'Set' : 'Not set'
         });
+        console.log('AI Prioritize - Received preferences:', preferences);
         
         if (!todos || !preferences) {
           return res.status(400).json({ error: 'Todos and preferences are required' });
