@@ -35,7 +35,8 @@ export class TodosComponent implements OnInit {
     // Initialize the store if user is authenticated
     this.todoStore.initializeIfAuthenticated();
     this.loadAvailableUsers();
-    this.loadUserPreferences();
+    // Get AI insights after store is initialized
+    // this.getAIInsights();
   }
 
   loadAvailableUsers() {
