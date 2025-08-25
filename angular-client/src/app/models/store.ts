@@ -1,9 +1,20 @@
 import { io, Socket } from "socket.io-client";
-import { ClientEvents, ServerEvents } from "../../../common/events";
-import { environment } from '../environments/environment';
+import { ClientEvents, ServerEvents } from "../../../../common/events";
+import { environment } from '../../environments/environment';
 import {Injectable} from "@angular/core";
-import { AuthService } from './auth.service';
+import { AuthService } from '../services/auth.service';
+import { HttpClient } from '@angular/common/http';
 
+export interface UserPreferences {
+  petCare: boolean;
+  laundry: boolean;
+  cooking: boolean;
+  organization: boolean;
+  plantCare: boolean;
+  houseWork: boolean;
+  yardWork: boolean;
+  familyCare: boolean;
+}
 
 export interface Todo {
   id: string,
@@ -36,9 +47,19 @@ const mapTodo = (todo: any) => {
 @Injectable()
 export class TodoStore {
   public todos: Array<Todo> = [];
+  public userPreferences: UserPreferences = {
+    petCare: false,
+    laundry: false,
+    cooking: false,
+    organization: true,
+    plantCare: false,
+    houseWork: false,
+    yardWork: false,
+    familyCare: false
+  };
   private socket: Socket<ServerEvents, ClientEvents>;
 
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService, private http: HttpClient) {
     const token = this.authService.getToken();
     if (!token) {
       throw new Error('No authentication token available');
@@ -96,6 +117,49 @@ export class TodoStore {
         this.todos.splice(index, 1);
       }
     })
+
+    // Load user preferences on initialization
+    this.loadUserPreferences();
+  }
+
+  // User Preferences Management
+  loadUserPreferences() {
+    const token = this.authService.getToken();
+    if (token) {
+      this.http.get<UserPreferences>(`${environment.serverUrl}/user/preferences`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      }).subscribe({
+        next: (preferences) => {
+          this.userPreferences = preferences;
+          console.log('User preferences loaded:', preferences);
+        },
+        error: (err) => {
+          console.error('Error loading user preferences:', err);
+          // Keep default preferences if loading fails
+        }
+      });
+    }
+  }
+
+  updateUserPreferences(preferences: UserPreferences) {
+    const token = this.authService.getToken();
+    if (token) {
+      this.http.put(`${environment.serverUrl}/user/preferences`, preferences, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      }).subscribe({
+        next: () => {
+          this.userPreferences = preferences;
+          console.log('User preferences updated:', preferences);
+        },
+        error: (err) => {
+          console.error('Error updating user preferences:', err);
+        }
+      });
+    }
+  }
+
+  getUserPreferences(): UserPreferences {
+    return this.userPreferences;
   }
 
   private getWithCompleted(completed: boolean) {

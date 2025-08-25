@@ -1,28 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../environments/environment';
+import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
-
-export interface Todo {
-  id: string;
-  title: string;
-  priority: string;
-  completed: boolean;
-  createdBy: string;
-  assignedTo: string;
-}
-
-export interface UserPreferences {
-  petCare: boolean;
-  laundry: boolean;
-  cooking: boolean;
-  organization: boolean;
-  plantCare: boolean;
-  houseWork: boolean;
-  yardWork: boolean;
-  familyCare: boolean;
-}
+import { Todo, UserPreferences } from '../models/store';
 
 export interface PrioritizedTodo extends Todo {
   aiPriority: number;

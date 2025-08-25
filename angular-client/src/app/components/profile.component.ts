@@ -1,21 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from './auth.service';
+import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../environments/environment';
+import { environment } from '../../environments/environment';
+import { TodoStore, UserPreferences } from '../models/store';
 
-interface UserPreferences {
-  petCare: boolean;
-  laundry: boolean;
-  cooking: boolean;
-  organization: boolean;
-  plantCare: boolean;
-  houseWork: boolean;
-  yardWork: boolean;
-  familyCare: boolean;
-}
+
 
 @Component({
   selector: 'app-profile',
@@ -45,7 +37,8 @@ export class ProfileComponent implements OnInit {
   constructor(
     private authService: AuthService, 
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private todoStore: TodoStore
   ) {}
 
   ngOnInit() {
@@ -60,21 +53,9 @@ export class ProfileComponent implements OnInit {
 
   loadUserPreferences() {
     this.loading = true;
-    const token = this.authService.getToken();
-    
-    this.http.get<UserPreferences>(`${environment.serverUrl}/user/preferences`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    }).subscribe({
-      next: (prefs) => {
-        this.preferences = { ...this.preferences, ...prefs };
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Error loading preferences:', err);
-        this.loading = false;
-        // If preferences don't exist yet, we'll use defaults
-      }
-    });
+    // Get preferences from the store
+    this.preferences = { ...this.todoStore.getUserPreferences() };
+    this.loading = false;
   }
 
   toggleEdit() {
@@ -90,25 +71,14 @@ export class ProfileComponent implements OnInit {
     this.error = '';
     this.success = '';
     
-    const token = this.authService.getToken();
-    
-    this.http.put(`${environment.serverUrl}/user/preferences`, this.preferences, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    }).subscribe({
-      next: () => {
-        this.success = 'Preferences saved successfully!';
-        this.isEditing = false;
-        this.loading = false;
-        setTimeout(() => {
-          this.success = '';
-        }, 3000);
-      },
-      error: (err) => {
-        console.error('Error saving preferences:', err);
-        this.error = 'Failed to save preferences. Please try again.';
-        this.loading = false;
-      }
-    });
+    // Update preferences through the store
+    this.todoStore.updateUserPreferences(this.preferences);
+    this.success = 'Preferences saved successfully!';
+    this.isEditing = false;
+    this.loading = false;
+    setTimeout(() => {
+      this.success = '';
+    }, 3000);
   }
 
   logout() {
