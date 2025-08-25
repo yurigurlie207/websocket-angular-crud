@@ -134,9 +134,14 @@ export class TodosComponent implements OnInit {
 
   prioritizeWithAI() {
     this.isAILoading = true;
-    const todos = this.todoStore.todos.filter(todo => !todo.completed);
     
-    this.claudeService.prioritizeTodos(todos, this.todoStore.getUserPreferences()).subscribe({
+    const todos = this.todoStore.todos.filter(todo => !todo.completed);
+    const preferences = this.todoStore.getUserPreferences();
+    
+    console.log('AI Prioritization - Current preferences:', preferences);
+    console.log('AI Prioritization - Todos to prioritize:', todos);
+    
+    this.claudeService.prioritizeTodos(todos, preferences).subscribe({
       next: (prioritizedTodos: PrioritizedTodo[]) => {
         // Update todos with AI priority
         prioritizedTodos.forEach(prioritizedTodo => {

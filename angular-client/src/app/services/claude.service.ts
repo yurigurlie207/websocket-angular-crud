@@ -21,7 +21,9 @@ export class ClaudeService {
    * Get AI-powered task prioritization based on user preferences
    */
   prioritizeTodos(todos: Todo[], preferences: UserPreferences): Observable<PrioritizedTodo[]> {
+    console.log('ClaudeService - Received preferences for prioritization:', preferences);
     const prompt = this.buildPrioritizationPrompt(todos, preferences);
+    console.log('ClaudeService - Generated prompt:', prompt);
     
     const token = this.auth.getToken();
     const headers = new HttpHeaders({
@@ -42,23 +44,8 @@ export class ClaudeService {
   private buildPrioritizationPrompt(todos: Todo[], preferences: UserPreferences): string {
     const activeTodos = todos.filter(todo => !todo.completed);
   
-    // Simplify preferences
-    const preferencesText = Object.entries(preferences)
-      .filter(([_, value]) => value === true)
-      .map(([key, _]) => {
-        const descriptions: Record<string, string> = {
-          petCare: 'Pet care (feeding, walking, grooming)',
-          laundry: 'Laundry and clothing care',
-          cooking: 'Cooking and meal preparation',
-          organization: 'Organization and tidying',
-          plantCare: 'Plant care and gardening',
-          houseWork: 'House cleaning and maintenance',
-          yardWork: 'Yard work and outdoor maintenance',
-          familyCare: 'Family care and childcare'
-        };
-        return descriptions[key] || key;
-      })
-      .join('\n') || 'No specific preferences set - user is open to all tasks.';
+    // Use the consistent preference formatting method
+    const preferencesText = this.formatPreferences(preferences);
   
     // Simplify todos (remove emojis and bullets)
     const todosText = activeTodos.map(todo => 

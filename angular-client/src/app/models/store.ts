@@ -160,7 +160,7 @@ export class TodoStore {
       }).subscribe({
         next: () => {
           this.userPreferences = preferences;
-          console.log('User preferences updated:', preferences);
+          console.log('User preferences updated in store:', preferences);
         },
         error: (err) => {
           console.error('Error updating user preferences:', err);
@@ -171,6 +171,11 @@ export class TodoStore {
 
   getUserPreferences(): UserPreferences {
     return this.userPreferences;
+  }
+
+  refreshUserPreferences() {
+    console.log('Refreshing user preferences from server...');
+    this.loadUserPreferences();
   }
 
   private getWithCompleted(completed: boolean) {
