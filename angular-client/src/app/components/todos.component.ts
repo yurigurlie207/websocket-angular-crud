@@ -139,18 +139,38 @@ export class TodosComponent implements OnInit {
     const preferences = this.todoStore.getUserPreferences();
     
     console.log('AI Prioritization - Current preferences:', preferences);
+    console.log('AI Prioritization - Pet care enabled:', preferences.petCare);
     console.log('AI Prioritization - Todos to prioritize:', todos);
+    console.log('AI Prioritization - Looking for pet care tasks:', todos.filter(t => 
+      t.title.toLowerCase().includes('feed') || 
+      t.title.toLowerCase().includes('pet') || 
+      t.title.toLowerCase().includes('bunny') ||
+      t.title.toLowerCase().includes('dog') ||
+      t.title.toLowerCase().includes('cat')
+    ));
     
     this.claudeService.prioritizeTodos(todos, preferences).subscribe({
-      next: (prioritizedTodos: PrioritizedTodo[]) => {
-        // Update todos with AI priority
-        prioritizedTodos.forEach(prioritizedTodo => {
-          const todo = this.todoStore.todos.find(t => t.id === prioritizedTodo.id);
+      next: (enhancedTodos: any[]) => {
+        console.log('AI Prioritization - Received enhanced todos:', enhancedTodos);
+        
+        // The server returns full todo objects with AI priorities already merged
+        // We need to update our local todos with the AI data from the response
+        enhancedTodos.forEach(enhancedTodo => {
+          const todo = this.todoStore.todos.find(t => t.id === enhancedTodo.id);
           if (todo) {
-            (todo as any).aiPriority = prioritizedTodo.aiPriority;
-            (todo as any).aiReason = prioritizedTodo.aiReason;
+            (todo as any).aiPriority = enhancedTodo.aiPriority;
+            (todo as any).aiReason = enhancedTodo.aiReason;
+            console.log(`Updated todo "${todo.title}" with AI priority: ${enhancedTodo.aiPriority}, reason: ${enhancedTodo.aiReason}`);
+          } else {
+            console.warn(`Todo with id ${enhancedTodo.id} not found in store`);
           }
         });
+        
+        console.log('AI Prioritization - Todos after update:', this.todoStore.todos.map(t => ({
+          title: t.title,
+          aiPriority: (t as any).aiPriority,
+          aiReason: (t as any).aiReason
+        })));
         
         // Sort todos by AI priority
         this.todoStore.todos.sort((a, b) => {

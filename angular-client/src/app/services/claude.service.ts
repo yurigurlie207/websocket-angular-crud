@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 import { Todo, UserPreferences } from '../models/store';
@@ -22,6 +23,9 @@ export class ClaudeService {
    */
   prioritizeTodos(todos: Todo[], preferences: UserPreferences): Observable<PrioritizedTodo[]> {
     console.log('ClaudeService - Received preferences for prioritization:', preferences);
+    console.log('ClaudeService - Pet care enabled:', preferences.petCare);
+    console.log('ClaudeService - Todos to prioritize:', todos.map(t => ({ title: t.title, priority: t.priority, assignedTo: t.assignedTo })));
+    
     const prompt = this.buildPrioritizationPrompt(todos, preferences);
     console.log('ClaudeService - Generated prompt:', prompt);
     
@@ -35,7 +39,13 @@ export class ClaudeService {
       todos,
       preferences,
       prompt
-    }, { headers });
+    }, { headers }).pipe(
+      tap(response => {
+        console.log('ClaudeService - Raw response from server:', response);
+        console.log('ClaudeService - Response type:', typeof response);
+        console.log('ClaudeService - Response length:', Array.isArray(response) ? response.length : 'Not an array');
+      })
+    );
   }
 
   /**
@@ -66,6 +76,18 @@ export class ClaudeService {
   3. Dependencies (tasks that need to be done before others)
   4. Energy levels (when tasks are typically done)
   5. Family impact (tasks affecting others)
+  
+  IMPORTANT: When a user has a preference for a task category (like "Pet care"), prioritize tasks that fall into that category higher than tasks that don't match their preferences.
+  
+  TASK CATEGORIZATION:
+  - Pet care tasks include: feeding pets, walking pets, grooming pets, cleaning pet areas, pet health care
+  - Cooking tasks include: meal preparation, cooking, baking, meal planning
+  - Laundry tasks include: washing clothes, drying clothes, folding clothes, ironing
+  - Organization tasks include: tidying, decluttering, organizing spaces
+  - Plant care tasks include: watering plants, gardening, plant maintenance
+  - House work tasks include: cleaning, vacuuming, dusting, mopping
+  - Yard work tasks include: outdoor maintenance, lawn care, gardening
+  - Family care tasks include: childcare, helping family members
   
   RESPONSE FORMAT:
   Return a JSON array of objects with this structure:
