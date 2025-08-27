@@ -23,7 +23,7 @@ console.log('Claude API Key preview:', CLAUDE_API_KEY ? `${CLAUDE_API_KEY.substr
 /**
  * Call Claude API with the given prompt
  */
-async function callClaudeAPI(prompt, maxRetries = 3) {
+async function callClaudeAPI(prompt, maxRetries = 1) {
   const safePrompt = prompt
     .replace(/•/g, '-')
     .replace(/\*\*/g, '')
@@ -77,12 +77,14 @@ async function callClaudeAPI(prompt, maxRetries = 3) {
     } catch (error) {
       console.error(`Claude API attempt ${attempt + 1} failed:`, error);
 
-      attempt++;
-      if (attempt < maxRetries) {
-        const backoff = 500 * Math.pow(2, attempt); // 500ms, 1s, 2s...
-        console.log(`Retrying after ${backoff}ms...`);
-        await delay(backoff);
-      } else {
+              attempt++;
+        if (attempt < maxRetries) {
+          // Longer backoff for 529 errors (overloaded)
+          const baseDelay = 1000; // Start with 1 second
+          const backoff = baseDelay * Math.pow(3, attempt); // 1s, 3s, 9s...
+          console.log(`Retrying after ${backoff}ms...`);
+          await delay(backoff);
+        } else {
         console.error('Max retries reached, throwing error');
         throw error;
       }
@@ -139,13 +141,26 @@ export default function (components) {
         let prioritizedTodos;
         
         try {
+          console.log('Claude API Key status:', CLAUDE_API_KEY ? 'Present' : 'Missing');
+          console.log('Claude API Key preview:', CLAUDE_API_KEY ? `${CLAUDE_API_KEY.substring(0, 10)}...` : 'None');
+          
           claudeResponse = await callClaudeAPI(prompt);
           console.log('Claude response received, length:', claudeResponse.length);
+          console.log('Claude raw response:', claudeResponse);
           
           // Parse the response
           prioritizedTodos = parseClaudeResponse(claudeResponse);
+          console.log('Claude parsed response:', prioritizedTodos);
         } catch (claudeError) {
           console.error('Claude API failed, using fallback prioritization:', claudeError);
+          console.error('Claude API error details:', {
+            message: claudeError.message,
+            stack: claudeError.stack,
+            name: claudeError.name
+          });
+          
+          // Fallback: smart prioritization based on preferences
+          console.log('Using fallback prioritization with preferences:', preferences);
           
           // Fallback: simple prioritization based on preferences
           prioritizedTodos = todos.map((todo, index) => ({
@@ -157,7 +172,8 @@ export default function (components) {
         
         // Merge AI prioritization with original todos
         const enhancedTodos = todos.map(todo => {
-          const aiData = prioritizedTodos.find(p => p.id === todo.id);
+          // Claude uses todo titles as IDs, so match by title instead of ID
+          const aiData = prioritizedTodos.find(p => p.id === todo.title);
           return {
             ...todo,
             aiPriority: aiData ? aiData.aiPriority : 999,
@@ -167,6 +183,13 @@ export default function (components) {
 
         // Sort by AI priority
         enhancedTodos.sort((a, b) => a.aiPriority - b.aiPriority);
+
+        console.log('AI Prioritization - Sending enhanced todos:', enhancedTodos.map(t => ({
+          id: t.id,
+          title: t.title,
+          aiPriority: t.aiPriority,
+          aiReason: t.aiReason
+        })));
 
         res.json(enhancedTodos);
       } catch (error) {
